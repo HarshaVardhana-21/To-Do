@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "types": ["vite/client", "node", "@testing-library/jest-dom/vitest"],
+    "noUnusedLocals": false
+  },
+  "include": ["../src", "."],
+  "exclude": ["coverage", "e2e/report", "e2e/results"]
+}
