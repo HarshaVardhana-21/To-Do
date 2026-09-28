@@ -12,7 +12,7 @@ export function Avatar({ name, src, className }: AvatarProps) {
   if (src) return <img src={src} alt={`${name}'s profile picture`} className={cn(base, 'object-cover')} />
   return (
     <span
-      className={cn(base, 'bg-brand-100 font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-100')}
+      className={cn(base, 'type-display bg-brand-100 font-semibold tracking-normal text-brand-700 dark:bg-brand-500/20 dark:text-brand-100')}
       aria-hidden="true"
     >
       {initialsOf(name)}

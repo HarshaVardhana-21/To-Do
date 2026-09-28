@@ -28,7 +28,7 @@ export function TodoFilters({ filters, searchInput, onSearchInput, onChange }: T
               aria-selected={filters.status === tab.value}
               onClick={() => onChange({ status: tab.value })}
               className={cn(
-                'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition sm:flex-none',
+                'flex-1 rounded-md px-3 py-1.5 text-sm font-semibold transition sm:flex-none',
                 filters.status === tab.value
                   ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
                   : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',

@@ -81,9 +81,9 @@ export default function DashboardPage() {
       <Navbar />
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-8">
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{format(new Date(), 'EEEE, MMMM d')}</p>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {greeting()}, {user?.name.split(' ')[0]}
+          <p className="eyebrow">{format(new Date(), 'EEEE · MMMM d')}</p>
+          <h1 className="type-display mt-2 text-4xl font-medium sm:text-5xl">
+            {greeting()}, <span className="type-accent">{user?.name.split(' ')[0]}</span>
           </h1>
         </div>
 

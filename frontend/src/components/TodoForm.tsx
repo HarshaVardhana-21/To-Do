@@ -63,7 +63,7 @@ export function TodoForm({ initial, onSubmit, onCancel, compact = false }: TodoF
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex gap-2">
         <input
-          className="input"
+          className="input text-[0.9375rem] placeholder:font-display placeholder:italic"
           placeholder="What needs to be done?"
           value={title}
           onChange={(e) => updateTitle(e.target.value)}

@@ -11,8 +11,8 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
       <main className="flex flex-1 items-center justify-center px-4 pb-16">
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+            <h1 className="type-display text-4xl font-medium">{title}</h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
           </div>
           <div className="card p-6">{children}</div>
         </div>

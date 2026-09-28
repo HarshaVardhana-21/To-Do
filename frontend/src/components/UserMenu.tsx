@@ -18,7 +18,7 @@ function MenuItem({ icon, children, onSelect, danger }: { icon: ReactNode; child
       tabIndex={-1}
       onClick={onSelect}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm outline-none transition hover:bg-slate-100 focus-visible:bg-slate-100 dark:hover:bg-slate-800 dark:focus-visible:bg-slate-800',
+        'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium outline-none transition hover:bg-slate-100 focus-visible:bg-slate-100 dark:hover:bg-slate-800 dark:focus-visible:bg-slate-800',
         danger ? 'text-red-600 dark:text-red-400' : 'text-slate-700 dark:text-slate-200',
       )}
     >
@@ -98,8 +98,8 @@ export function UserMenu({ user, onProfile, onLogout }: UserMenuProps) {
           <div className="flex items-center gap-3 border-b border-slate-200 px-3 pb-3 pt-2 dark:border-slate-800">
             <Avatar name={user.name} src={user.avatar} className="size-10 text-sm" />
             <div className="min-w-0 leading-tight">
-              <p className="truncate text-sm font-medium">{user.name}</p>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+              <p className="truncate text-sm font-semibold">{user.name}</p>
+              <p className="truncate font-mono text-[0.6875rem] text-slate-500 dark:text-slate-400">{user.email}</p>
             </div>
           </div>
           <div className="pt-1.5">

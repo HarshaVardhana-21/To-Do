@@ -29,7 +29,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
       <div className="card relative w-full max-w-lg p-5 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold">{title}</h2>
+          <h2 className="type-display text-xl font-semibold">{title}</h2>
           <button type="button" onClick={onClose} className="btn-ghost -mr-2" aria-label="Close">
             <X className="size-5" />
           </button>
@@ -53,7 +53,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', onConfirm, onCancel }: ConfirmDialogProps) {
   return (
     <Modal open={open} title={title} onClose={onCancel}>
-      <p className="text-sm text-slate-600 dark:text-slate-400">{message}</p>
+      <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{message}</p>
       <div className="mt-6 flex justify-end gap-2">
         <button type="button" className="btn-secondary" onClick={onCancel}>
           Cancel

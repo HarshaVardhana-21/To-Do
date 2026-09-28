@@ -63,6 +63,7 @@ Request flow: `server.ts` (connect DB, listen) → `app.ts` (helmet, cors allow-
 - `pages/DashboardPage.tsx` persists filters (not search) to `localStorage['todoFilters']`, validating each value on load. Search is debounced (`useDebounce`, 300ms).
 - `components/TodoForm.tsx` serves both quick-add (`compact`) and the edit modal (`initial`). Field ids come from `useId()` because both forms can be mounted at once. In add mode the form clears immediately on submit and restores the text on failure.
 - Dates: due dates are stored as ISO strings at the **end of the local day** (`fromDateInput`/`toDateInput` in `lib/utils.ts`). `isOverdue` means the due day has fully passed.
+- Typography: three self-hosted variable fonts (`@fontsource-variable/*`, imported in `index.css`). Plus Jakarta Sans is the UI font (`font-sans`), Fraunces is for headings and big numbers (`type-display`, plus `type-accent` for the italic accent word), and JetBrains Mono is for data like dates, tags and counts (`font-mono`, `eyebrow`).
 - Theming: dark mode is the `dark` class on `<html>` (`@custom-variant dark` in `index.css`). An inline script in `index.html` applies the saved `localStorage['theme']` before paint. Shared styles are Tailwind v4 `@utility` classes (`btn-primary`, `card`, `input`, …) in `src/index.css`.
 - `vite.config.ts` proxy target can be overridden with `VITE_API_PROXY_TARGET` (E2E uses this). `vite preview` inherits the same proxy.
 
