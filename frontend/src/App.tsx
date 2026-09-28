@@ -26,7 +26,7 @@ export default function App() {
           containerStyle={{ top: 72 }} // just below the 64px sticky header, so the menu stays clickable
           toastOptions={{
             duration: 3000, // every toast (success and error alike) stays for 3 seconds
-            className: '!bg-white !text-slate-900 dark:!bg-slate-800 dark:!text-slate-100 !text-sm !shadow-lg',
+            className: '!bg-white !text-slate-900 dark:!bg-slate-800 dark:!text-slate-100 !font-sans !text-sm !font-medium !shadow-lg',
           }}
         />
       </AuthProvider>

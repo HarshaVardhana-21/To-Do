@@ -117,7 +117,7 @@ function ProfileForm({ user, onDone }: { user: User; onDone: () => void }) {
       </div>
       <div>
         <label className="label" htmlFor={`${id}-email`}>Email</label>
-        <input id={`${id}-email`} className="input opacity-70" value={user.email} readOnly disabled />
+        <input id={`${id}-email`} className="input font-mono text-[0.8125rem] opacity-70" value={user.email} readOnly disabled />
       </div>
       <div>
         <label className="label" htmlFor={`${id}-about`}>About you</label>
@@ -130,7 +130,7 @@ function ProfileForm({ user, onDone }: { user: User; onDone: () => void }) {
           maxLength={ABOUT_MAX_LENGTH}
           aria-describedby={`${id}-about-count`}
         />
-        <p id={`${id}-about-count`} className="mt-1 text-right text-xs text-slate-500 dark:text-slate-400">
+        <p id={`${id}-about-count`} className="mt-1 text-right font-mono text-[0.6875rem] tabular-nums text-slate-500 dark:text-slate-400">
           {about.length}/{ABOUT_MAX_LENGTH}
         </p>
       </div>

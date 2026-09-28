@@ -39,7 +39,7 @@ export const TodoItem = memo(function TodoItem({ todo, onToggle, onEdit, onDelet
       <div className="min-w-0 flex-1">
         <p
           className={cn(
-            'break-words font-medium',
+            'break-words text-[0.9375rem] font-semibold tracking-[-0.01em]',
             todo.completed && 'text-slate-400 line-through dark:text-slate-500',
           )}
         >
@@ -48,7 +48,7 @@ export const TodoItem = memo(function TodoItem({ todo, onToggle, onEdit, onDelet
         {todo.description && (
           <p
             className={cn(
-              'mt-1 whitespace-pre-line break-words text-sm text-slate-600 dark:text-slate-400',
+              'mt-1 whitespace-pre-line break-words text-sm leading-relaxed text-slate-600 dark:text-slate-400',
               todo.completed && 'opacity-60',
             )}
           >
@@ -56,14 +56,14 @@ export const TodoItem = memo(function TodoItem({ todo, onToggle, onEdit, onDelet
           </p>
         )}
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-          <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ring-1 ring-inset', p.badge)}>
+          <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] ring-1 ring-inset', p.badge)}>
             <span className={cn('size-1.5 rounded-full', p.dot)} />
             {p.label}
           </span>
           {todo.dueDate && (
             <span
               className={cn(
-                'inline-flex items-center gap-1',
+                'inline-flex items-center gap-1 font-mono text-[0.6875rem]',
                 overdue ? 'font-medium text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400',
               )}
             >
@@ -75,7 +75,7 @@ export const TodoItem = memo(function TodoItem({ todo, onToggle, onEdit, onDelet
           {todo.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+              className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[0.6875rem] text-slate-600 dark:bg-slate-800 dark:text-slate-300"
             >
               #{tag}
             </span>

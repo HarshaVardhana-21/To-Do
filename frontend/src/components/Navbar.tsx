@@ -23,7 +23,7 @@ export function ThemeToggle() {
 
 export function Logo() {
   return (
-    <span className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+    <span className="type-display flex items-center gap-2.5 text-[1.375rem] font-semibold">
       <span className="flex size-8 items-center justify-center rounded-lg bg-brand-600 text-white">
         <CheckSquare className="size-5" />
       </span>
@@ -48,8 +48,8 @@ export function Navbar() {
               <div className="flex min-w-0 items-center gap-2 pl-1 sm:pl-2">
                 <Avatar name={user.name} src={user.avatar} />
                 <div className="hidden min-w-0 leading-tight sm:block">
-                  <p className="truncate text-sm font-medium">{user.name}</p>
-                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+                  <p className="truncate text-sm font-semibold">{user.name}</p>
+                  <p className="truncate font-mono text-[0.6875rem] text-slate-500 dark:text-slate-400">{user.email}</p>
                 </div>
               </div>
               <UserMenu user={user} onProfile={() => setProfileOpen(true)} onLogout={logout} />

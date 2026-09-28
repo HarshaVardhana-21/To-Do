@@ -17,17 +17,17 @@ export function StatsBar({ stats }: { stats: TodoStats }) {
         {items.map(({ label, value, icon: Icon, tone }) => (
           <div key={label} className="card p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</span>
+              <span className="eyebrow">{label}</span>
               <Icon className={cn('size-4', tone)} />
             </div>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
+            <p className="type-display mt-2 text-4xl font-medium leading-none tabular-nums">{value}</p>
           </div>
         ))}
       </div>
       <div>
-        <div className="mb-1 flex justify-between text-xs text-slate-500 dark:text-slate-400">
-          <span>Progress</span>
-          <span className="tabular-nums">{pct}%</span>
+        <div className="mb-1.5 flex items-baseline justify-between">
+          <span className="eyebrow">Progress</span>
+          <span className="font-mono text-xs font-semibold tabular-nums text-slate-700 dark:text-slate-300">{pct}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
           <div className="h-full rounded-full bg-brand-600 transition-all duration-500" style={{ width: `${pct}%` }} />
