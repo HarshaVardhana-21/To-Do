@@ -63,7 +63,7 @@ function ProfileForm({ user, onDone }: { user: User; onDone: () => void }) {
     setSaving(true)
     try {
       await updateProfile({ name: name.trim(), about: about.trim(), avatar })
-      toast.success('Profile updated')
+      toast.success('Profile updated', { icon: '😎' })
       onDone()
     } catch (err) {
       setError(getErrorMessage(err, 'Could not update your profile'))

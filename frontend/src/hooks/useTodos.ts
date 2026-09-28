@@ -61,12 +61,12 @@ export function useTodos(filters: TodoFilters) {
     async (input: TodoInput) => {
       try {
         await todosApi.create(input)
-        toast.success('Task added')
+        toast.success('Task added', { icon: '📝' })
         // Refetch so the new item lands in the right place for the active sort.
         await Promise.all([fetchTodos(), refreshStats()])
         return true
       } catch (err) {
-        toast.error(getErrorMessage(err, 'Failed to add task'))
+        toast.error(getErrorMessage(err, 'Failed to add task'), { icon: '😬' })
         return false
       }
     },
@@ -85,12 +85,12 @@ export function useTodos(filters: TodoFilters) {
       try {
         const updated = await todosApi.update(id, input)
         setTodos((list) => list.map((t) => (t.id === id ? updated : t)))
-        if (!silent) toast.success('Task updated')
+        if (!silent) toast.success('Task updated', { icon: '✏️' })
         void refreshStats()
         return true
       } catch (err) {
         setTodos(previous)
-        toast.error(getErrorMessage(err, 'Failed to update task'))
+        toast.error(getErrorMessage(err, 'Failed to update task'), { icon: '🙈' })
         return false
       }
     },
@@ -108,11 +108,11 @@ export function useTodos(filters: TodoFilters) {
       setTodos((list) => list.filter((t) => t.id !== id))
       try {
         await todosApi.remove(id)
-        toast.success('Task deleted')
+        toast.success('Task deleted', { icon: '🗑️' })
         void refreshStats()
       } catch (err) {
         setTodos(previous)
-        toast.error(getErrorMessage(err, 'Failed to delete task'))
+        toast.error(getErrorMessage(err, 'Failed to delete task'), { icon: '🚧' })
       }
     },
     [todos, refreshStats],
@@ -121,10 +121,11 @@ export function useTodos(filters: TodoFilters) {
   const clearCompleted = useCallback(async () => {
     try {
       const count = await todosApi.clearCompleted()
-      toast.success(count ? `Cleared ${count} completed task${count === 1 ? '' : 's'}` : 'Nothing to clear')
+      if (count) toast.success(`Cleared ${count} completed task${count === 1 ? '' : 's'}`, { icon: '🧹' })
+      else toast.success('Nothing to clear', { icon: '🤷' })
       await Promise.all([fetchTodos(), refreshStats()])
     } catch (err) {
-      toast.error(getErrorMessage(err, 'Failed to clear completed tasks'))
+      toast.error(getErrorMessage(err, 'Failed to clear completed tasks'), { icon: '🌪️' })
     }
   }, [fetchTodos, refreshStats])
 

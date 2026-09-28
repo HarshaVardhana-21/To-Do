@@ -139,6 +139,7 @@ describe('Dashboard: completing, editing, deleting', () => {
     await waitFor(() => expect(screen.queryByText('Trash me')).not.toBeInTheDocument())
     expect(db.todosFor(account.id)).toHaveLength(0)
     expect(await screen.findByText('Task deleted')).toBeInTheDocument()
+    expect(screen.getByText('🗑️')).toBeInTheDocument()
   })
 
   it('clears completed tasks after confirmation', async () => {

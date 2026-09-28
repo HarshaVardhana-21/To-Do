@@ -4,6 +4,21 @@ const statCard = (page: import('@playwright/test').Page, label: string) =>
   page.locator('.card').filter({ has: page.getByText(label, { exact: true }) }).first()
 
 test.describe('todos (real backend)', () => {
+  test('toasts stay on screen for about 3 seconds', async ({ authedPage: page }) => {
+    const input = page.getByRole('textbox', { name: 'Title' }).first()
+    await input.fill('Timed toast')
+    await input.press('Enter')
+    const toastEl = page.getByRole('status').filter({ hasText: 'Task added' })
+    await expect(toastEl).toBeVisible()
+    const shownAt = Date.now()
+    await expect(toastEl).toBeHidden({ timeout: 6_000 })
+    const elapsed = Date.now() - shownAt
+    // react-hot-toast keeps a toast in the DOM ~1s after it starts fading, so 3s shows up as ~4s here.
+    // A 2s duration (the old success default) would land near 3s, and 4s near 5s.
+    expect(elapsed).toBeGreaterThan(3_500)
+    expect(elapsed).toBeLessThan(4_600)
+  })
+
   test('add, complete, and see stats update', async ({ authedPage: page }) => {
     await addTodo(page, 'Buy milk')
     await addTodo(page, 'Walk the dog')

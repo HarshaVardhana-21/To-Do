@@ -26,7 +26,7 @@ export default function RegisterPage() {
     setSubmitting(true)
     try {
       await register(name.trim(), email, password)
-      toast.success('Account created! Please sign in.')
+      toast.success('Account created! Please sign in.', { icon: '🎉' })
       navigate('/login', { replace: true, state: { email: email.trim().toLowerCase() } })
     } catch (err) {
       setError(getErrorMessage(err, 'Registration failed'))

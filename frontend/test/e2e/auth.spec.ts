@@ -13,6 +13,13 @@ test.describe('authentication', () => {
     // bcrypt (cost 12) is intentionally slow, and parallel workers compete for CPU.
     await expect(page).toHaveURL('/login', { timeout: 20_000 })
     await expect(page.getByText('Account created! Please sign in.')).toBeVisible() // toast is short-lived: check first
+    // Toasts sit in the top-right corner, below the header.
+    const toastEl = page.getByRole('status').filter({ hasText: 'Account created!' })
+    const viewport = page.viewportSize()!
+    await expect.poll(async () => (await toastEl.boundingBox())?.y ?? 0).toBeGreaterThanOrEqual(64) // wait out the slide-in
+    const box = (await toastEl.boundingBox())!
+    expect(box.y).toBeLessThan(viewport.height / 3)
+    expect(box.x + box.width).toBeGreaterThan(viewport.width - 40)
     await expect(page.getByLabel('Email')).toHaveValue(email)
     await page.getByLabel('Password').fill('analytical1')
     await page.getByRole('button', { name: 'Sign in' }).click()

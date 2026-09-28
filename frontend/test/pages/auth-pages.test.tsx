@@ -21,6 +21,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
     await waitForPath('/')
     expect(await screen.findByText('Welcome back!')).toBeInTheDocument() // toast
+    expect(screen.getByText('👋')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /, Linus$/ })).toBeInTheDocument()
   })
 
@@ -122,6 +123,7 @@ describe('RegisterPage', () => {
     await fill(user, { name: '  Margaret Hamilton ', email: 'mh@example.com', pw: 'apollo1969', confirm: 'apollo1969' })
     await waitForPath('/login')
     expect(await screen.findByText('Account created! Please sign in.')).toBeInTheDocument()
+    expect(screen.getByText('🎉')).toBeInTheDocument()
     expect(db.findUserByEmail('mh@example.com')?.name).toBe('Margaret Hamilton') // trimmed
     expect(localStorage.getItem('token')).toBeNull()
     expect(field('Email')).toHaveValue('mh@example.com')

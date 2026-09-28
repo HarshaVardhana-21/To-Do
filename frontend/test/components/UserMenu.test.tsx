@@ -113,6 +113,7 @@ describe('ProfileModal', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Save profile' }))
 
     expect(await screen.findByText('Profile updated')).toBeInTheDocument()
+    expect(screen.getByText('😎')).toBeInTheDocument()
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(within(screen.getByRole('banner')).getByText('Amazing Grace')).toBeInTheDocument()
     expect(db.findUserById(me.id)).toMatchObject({ name: 'Amazing Grace', about: 'Wrote the first compiler.' })

@@ -90,7 +90,7 @@ describe('useTodos: mutations', () => {
     expect(ok).toBe(true)
     expect(hook.result.current.todos.map((t) => t.title)).toEqual(['New one'])
     expect(hook.result.current.stats.total).toBe(1)
-    expect(success).toHaveBeenCalledWith('Task added')
+    expect(success).toHaveBeenCalledWith('Task added', { icon: '📝' })
   })
 
   it('createTodo returns false and shows the server error on failure', async () => {
@@ -102,7 +102,7 @@ describe('useTodos: mutations', () => {
       ok = await hook.result.current.createTodo({ title: '  ' })
     })
     expect(ok).toBe(false)
-    expect(error).toHaveBeenCalledWith('Title is required')
+    expect(error).toHaveBeenCalledWith('Title is required', { icon: '😬' })
   })
 
   it('toggleTodo updates optimistically before the server responds', async () => {
@@ -148,7 +148,7 @@ describe('useTodos: mutations', () => {
     })
     expect(ok).toBe(false)
     expect(hook.result.current.todos[0].title).toBe('Stable')
-    expect(error).toHaveBeenCalledWith('Write failed')
+    expect(error).toHaveBeenCalledWith('Write failed', { icon: '🙈' })
   })
 
   it('removes a todo from the list when an update makes it stop matching the filter', async () => {
@@ -182,7 +182,7 @@ describe('useTodos: mutations', () => {
     const success = vi.spyOn(toast, 'success')
     const hook = await loaded(setup())
     await act(() => hook.result.current.clearCompleted())
-    expect(success).toHaveBeenCalledWith('Cleared 2 completed tasks')
+    expect(success).toHaveBeenCalledWith('Cleared 2 completed tasks', { icon: '🧹' })
     expect(hook.result.current.todos).toHaveLength(1)
   })
 
@@ -192,9 +192,9 @@ describe('useTodos: mutations', () => {
     const success = vi.spyOn(toast, 'success')
     const hook = await loaded(setup())
     await act(() => hook.result.current.clearCompleted())
-    expect(success).toHaveBeenLastCalledWith('Cleared 1 completed task')
+    expect(success).toHaveBeenLastCalledWith('Cleared 1 completed task', { icon: '🧹' })
     await act(() => hook.result.current.clearCompleted())
-    expect(success).toHaveBeenLastCalledWith('Nothing to clear')
+    expect(success).toHaveBeenLastCalledWith('Nothing to clear', { icon: '🤷' })
   })
 
   it('clearCompleted shows an error on failure', async () => {
@@ -203,6 +203,6 @@ describe('useTodos: mutations', () => {
     const error = vi.spyOn(toast, 'error')
     const hook = await loaded(setup())
     await act(() => hook.result.current.clearCompleted())
-    expect(error).toHaveBeenCalledWith('Nope')
+    expect(error).toHaveBeenCalledWith('Nope', { icon: '🌪️' })
   })
 })

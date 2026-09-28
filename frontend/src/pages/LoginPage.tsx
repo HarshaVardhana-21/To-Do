@@ -25,7 +25,7 @@ export default function LoginPage() {
     setSubmitting(true)
     try {
       await login(email, password)
-      toast.success('Welcome back!')
+      toast.success('Welcome back!', { icon: '👋' })
       navigate(from, { replace: true })
     } catch (err) {
       setError(getErrorMessage(err, 'Login failed'))
