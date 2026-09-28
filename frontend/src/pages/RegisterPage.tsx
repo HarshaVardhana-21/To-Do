@@ -1,10 +1,154 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import {
+  AlertCircle,
+  ArrowRight,
+  Check,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Lock,
+  Mail,
+  MoonStar,
+  Search,
+  ShieldCheck,
+  Tags,
+  UserRound,
+  X,
+} from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { getErrorMessage } from '../api/client'
 import { Spinner } from '../components/Spinner'
-import { AuthLayout } from './AuthLayout'
+import { Logo, ThemeToggle } from '../components/Navbar'
+import { cn } from '../lib/utils'
+
+const MIN_PASSWORD = 8
+
+// Same field treatment as the login page.
+const FIELD =
+  'h-[clamp(2.625rem,6vh,3rem)] w-full rounded-xl border border-slate-200 bg-white pl-11 pr-3 text-[0.9375rem] text-slate-900 shadow-xs outline-none transition ' +
+  'placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 ' +
+  'dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-700'
+
+const FIELD_ICON =
+  'pointer-events-none absolute left-4 top-1/2 size-[1.125rem] -translate-y-1/2 text-slate-400 transition group-focus-within:text-brand-600 dark:group-focus-within:text-brand-100'
+
+const STEPS = [
+  { title: 'Create your account', note: '~30 sec' },
+  { title: 'Add your first task', note: 'Anytime' },
+  { title: 'Watch your progress climb', note: 'Daily' },
+]
+
+const FEATURES = [
+  { icon: Tags, text: 'Quick-add with tags and due dates' },
+  { icon: Search, text: 'Search across every task' },
+  { icon: MoonStar, text: 'Light and dark, your call' },
+]
+
+const STRENGTH = [
+  { label: 'Too short', bar: 'bg-red-500', text: 'text-red-600 dark:text-red-400' },
+  { label: 'Weak', bar: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
+  { label: 'Good', bar: 'bg-lime-500', text: 'text-lime-700 dark:text-lime-400' },
+  { label: 'Strong', bar: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+] as const
+
+/** 0–3 index into STRENGTH. A guide only: the API just requires the minimum length. */
+function passwordStrength(pw: string) {
+  if (pw.length < MIN_PASSWORD) return 0
+  const score = [pw.length >= 12, /[a-z]/.test(pw) && /[A-Z]/.test(pw), /\d/.test(pw), /[^A-Za-z0-9]/.test(pw)].filter(Boolean).length
+  return score <= 1 ? 1 : score === 2 ? 2 : 3
+}
+
+/** Decorative onboarding preview on the brand panel. */
+function StepsCard() {
+  return (
+    <div
+      aria-hidden="true"
+      className="relative w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/40 ring-1 ring-inset ring-white/5 backdrop-blur-xl [padding:clamp(0.875rem,2.2vh,1.25rem)]"
+    >
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-white/50">Getting started</span>
+        <span className="font-mono text-[0.6875rem] tabular-nums text-white/60">Step 1 / 3</span>
+      </div>
+      <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full w-1/3 rounded-full bg-linear-to-r from-brand-500 via-violet-400 to-fuchsia-400" />
+      </div>
+      <ol className="mt-[clamp(0.75rem,1.8vh,1rem)] space-y-[clamp(0.375rem,0.9vh,0.5rem)]">
+        {STEPS.map((s, i) => (
+          <li
+            key={s.title}
+            className={cn(
+              'flex items-center gap-3 rounded-xl border px-3 py-[clamp(0.375rem,1.1vh,0.625rem)]',
+              i === 0 ? 'border-brand-400/30 bg-brand-500/10' : 'border-white/5 bg-white/[0.03]',
+            )}
+          >
+            <span
+              className={cn(
+                'flex size-[1.375rem] shrink-0 items-center justify-center rounded-full font-mono text-[0.6875rem] font-semibold',
+                i === 0 ? 'bg-brand-500 text-white shadow-md shadow-brand-500/40' : 'border border-white/20 text-white/50',
+              )}
+            >
+              {i + 1}
+            </span>
+            <span className={cn('flex-1 truncate text-sm font-medium', i === 0 ? 'text-white' : 'text-white/60')}>{s.title}</span>
+            <span className="font-mono text-[0.6875rem] text-white/40">{s.note}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+function BrandPanel() {
+  return (
+    <aside className="relative hidden min-h-0 overflow-hidden border-r border-white/5 bg-slate-950 text-white lg:flex lg:flex-col lg:gap-[clamp(1.5rem,4vh,2.5rem)] lg:px-12 lg:py-[clamp(1.75rem,5vh,3.5rem)] xl:px-16">
+      {/* Ambient light and a faint grid; mirrored from the login page so the two feel like a pair. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-40 -top-40 size-[34rem] rounded-full bg-violet-600/35 blur-3xl" />
+        <div className="absolute -bottom-48 -left-32 size-[30rem] rounded-full bg-brand-500/25 blur-3xl" />
+        <div className="absolute right-1/4 top-1/2 size-72 rounded-full bg-fuchsia-500/15 blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.04)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
+      </div>
+
+      <div className="relative shrink-0">
+        <Logo />
+      </div>
+
+      <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-[clamp(1rem,3.5vh,2.5rem)]">
+        <div className="flex flex-col items-start gap-[clamp(0.75rem,2vh,1.25rem)]">
+          <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-white/70">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+            </span>
+            Set up in seconds
+          </p>
+          <p className="type-display max-w-lg text-[clamp(2rem,min(12vh_-_2.5rem,4.5vw),3.75rem)] font-medium leading-[1.05]">
+            Start fresh.
+            <br />
+            <span className="type-accent text-indigo-200!">Stay ahead.</span>
+          </p>
+          <p className="max-w-md text-[clamp(0.875rem,1.8vh,1rem)] leading-relaxed text-white/60">
+            Create your space in under a minute. Capture tasks, set priorities and watch your progress build, day by day.
+          </p>
+        </div>
+        <StepsCard />
+      </div>
+
+      <ul className="relative grid w-full max-w-md shrink-0 grid-cols-3 gap-6 border-t border-white/10 pt-[clamp(1rem,2.5vh,1.5rem)] text-[0.8125rem] leading-snug text-white/60">
+        {FEATURES.map(({ icon: Icon, text }) => (
+          <li key={text} className="flex flex-col items-start gap-2.5">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+              <Icon className="size-3.5 text-indigo-200" />
+            </span>
+            {text}
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -14,13 +158,22 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPasswords, setShowPasswords] = useState(false)
+  const [capsLock, setCapsLock] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const strengthLevel = passwordStrength(password)
+  const strength = STRENGTH[strengthLevel]
+  const matches = confirm.length > 0 && confirm === password
+
+  const trackCapsLock = (e: KeyboardEvent<HTMLInputElement>) => setCapsLock(e.getModifierState('CapsLock'))
+  const passwordEvents = { onKeyDown: trackCapsLock, onKeyUp: trackCapsLock, onBlur: () => setCapsLock(false) }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-    if (password.length < 8) return setError('Password must be at least 8 characters')
+    if (password.length < MIN_PASSWORD) return setError(`Password must be at least ${MIN_PASSWORD} characters`)
     if (password !== confirm) return setError('Passwords do not match')
 
     setSubmitting(true)
@@ -35,74 +188,221 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout title="Create your account" subtitle="Start organizing your tasks in seconds">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-400" role="alert">
-            {error}
-          </p>
-        )}
-        <div>
-          <label className="label" htmlFor="name">Name</label>
-          <input
-            id="name"
-            className="input"
-            autoComplete="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={60}
-            required
-            autoFocus
-          />
+    <div className="grid min-h-dvh lg:h-dvh lg:grid-cols-[1.05fr_1fr]">
+      <BrandPanel />
+
+      <main className="relative flex min-h-0 flex-col overflow-x-hidden bg-white lg:overflow-y-auto dark:bg-slate-950">
+        {/* Soft glow behind the form; the brand panel carries the color on large screens. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-32 left-1/2 size-[28rem] -translate-x-1/2 rounded-full bg-violet-500/10 blur-3xl lg:hidden"
+        />
+
+        <header className="relative flex h-16 shrink-0 items-center justify-between px-4 sm:px-8">
+          <span className="lg:invisible">
+            <Logo />
+          </span>
+          <ThemeToggle />
+        </header>
+
+        <div className="relative flex flex-1 items-center justify-center px-4 pb-[clamp(1rem,4vh,3rem)] pt-[clamp(0.5rem,2vh,1.5rem)] sm:px-8">
+          <div className="w-full max-w-[440px]">
+            <p className="eyebrow">Get started</p>
+            <h1 className="type-display mt-[clamp(0.5rem,1.5vh,0.75rem)] text-[clamp(1.875rem,8.5vw,2.5rem)] font-medium leading-tight sm:text-[clamp(2.25rem,6vh,3rem)]">
+              Create your <span className="type-accent">account</span>
+            </h1>
+            <p className="mt-[clamp(0.5rem,1.5vh,0.75rem)] text-[0.9375rem] leading-relaxed text-slate-500 dark:text-slate-400">
+              Start organizing your tasks in seconds.
+            </p>
+
+            <form onSubmit={handleSubmit} className="mt-[clamp(1rem,3vh,2rem)] space-y-[clamp(0.75rem,2vh,1.25rem)]">
+              {error && (
+                <p
+                  className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
+                  role="alert"
+                >
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <span>{error}</span>
+                </p>
+              )}
+
+              <div className="grid gap-[clamp(0.75rem,2vh,1.25rem)] sm:grid-cols-2 sm:gap-4">
+                <div>
+                  <label className="label" htmlFor="name">Name</label>
+                  <div className="group relative">
+                    <UserRound className={FIELD_ICON} aria-hidden="true" />
+                    <input
+                      id="name"
+                      className={FIELD}
+                      placeholder="Ada Lovelace"
+                      autoComplete="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      maxLength={60}
+                      required
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="label" htmlFor="email">Email</label>
+                  <div className="group relative">
+                    <Mail className={FIELD_ICON} aria-hidden="true" />
+                    <input
+                      id="email"
+                      type="email"
+                      className={FIELD}
+                      placeholder="you@company.com"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <label className="label" htmlFor="password">Password</label>
+                      <span aria-live="polite" className="mb-1.5 text-[0.6875rem] font-semibold text-amber-600 dark:text-amber-400">
+                        {capsLock && 'Caps Lock on'}
+                      </span>
+                    </div>
+                    <div className="group relative">
+                      <Lock className={FIELD_ICON} aria-hidden="true" />
+                      <input
+                        id="password"
+                        type={showPasswords ? 'text' : 'password'}
+                        className={cn(FIELD, 'pr-12')}
+                        placeholder={`${MIN_PASSWORD}+ characters`}
+                        autoComplete="new-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        {...passwordEvents}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords((v) => !v)}
+                        className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                        aria-label={showPasswords ? 'Hide' : 'Show'}
+                        aria-controls="password confirm"
+                        title={showPasswords ? 'Hide passwords' : 'Show passwords'}
+                      >
+                        {showPasswords ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="label" htmlFor="confirm">Confirm password</label>
+                    <div className="group relative">
+                      <KeyRound className={FIELD_ICON} aria-hidden="true" />
+                      <input
+                        id="confirm"
+                        type={showPasswords ? 'text' : 'password'}
+                        className={cn(
+                          FIELD,
+                          'pr-10',
+                          confirm && !matches && 'border-red-300 focus:border-red-400 focus:ring-red-500/15 dark:border-red-500/40',
+                        )}
+                        placeholder="Repeat it"
+                        autoComplete="new-password"
+                        value={confirm}
+                        onChange={(e) => setConfirm(e.target.value)}
+                        {...passwordEvents}
+                        required
+                      />
+                      {confirm && (
+                        <span
+                          className={cn(
+                            'pointer-events-none absolute right-3.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full',
+                            matches ? 'bg-emerald-500 text-white' : 'bg-red-500/10 text-red-500',
+                          )}
+                          aria-hidden="true"
+                        >
+                          {matches ? <Check className="size-3" strokeWidth={3} /> : <X className="size-3" strokeWidth={3} />}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live guidance: strength on the left, match status on the right. */}
+                <div className="mt-2.5 flex items-center justify-between gap-3" aria-live="polite">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex gap-1" aria-hidden="true">
+                      {STRENGTH.map((s, i) => (
+                        <span
+                          key={s.label}
+                          className={cn(
+                            'h-1 w-7 rounded-full transition-colors duration-300',
+                            password && i <= strengthLevel ? strength.bar : 'bg-slate-200 dark:bg-slate-800',
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <span className={cn('text-[0.6875rem] font-semibold', password ? strength.text : 'text-slate-400 dark:text-slate-500')}>
+                      {password ? strength.label : `${MIN_PASSWORD}+ characters`}
+                    </span>
+                  </div>
+                  {confirm && (
+                    <span
+                      className={cn(
+                        'text-[0.6875rem] font-semibold',
+                        matches ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400',
+                      )}
+                    >
+                      {matches ? 'Passwords match' : "Doesn't match yet"}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="group relative inline-flex h-[clamp(2.75rem,6vh,3rem)] w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-linear-to-r from-brand-600 via-indigo-600 to-violet-600 px-4 text-[0.9375rem] font-semibold text-white shadow-lg shadow-brand-600/25 ring-1 ring-inset ring-white/10 transition hover:-translate-y-px hover:shadow-xl hover:shadow-brand-600/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30 active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {/* Light sweep on hover. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-[300%] motion-reduce:hidden"
+                />
+                {submitting && <Spinner />}
+                Create account
+                {!submitting && (
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                )}
+              </button>
+            </form>
+
+            <div className="mt-[clamp(1rem,3vh,2rem)] flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+              <span className="eyebrow">Been here before</span>
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+            </div>
+
+            <p className="mt-[clamp(0.75rem,2vh,1.25rem)] text-center text-sm text-slate-500 dark:text-slate-400">
+              Already have an account?{' '}
+              <Link
+                to="/login"
+                className="group inline-flex items-center gap-1 font-semibold text-brand-600 underline-offset-4 hover:underline dark:text-brand-100"
+              >
+                Sign in
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
+            </p>
+          </div>
         </div>
-        <div>
-          <label className="label" htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            className="input"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="label" htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            className="input"
-            autoComplete="new-password"
-            placeholder="At least 8 characters"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="label" htmlFor="confirm">Confirm password</label>
-          <input
-            id="confirm"
-            type="password"
-            className="input"
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn-primary w-full" disabled={submitting}>
-          {submitting && <Spinner />}
-          Create account
-        </button>
-      </form>
-      <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-        Already have an account?{' '}
-        <Link to="/login" className="font-medium text-brand-600 hover:underline dark:text-brand-100">
-          Sign in
-        </Link>
-      </p>
-    </AuthLayout>
+
+        <footer className="relative flex shrink-0 items-center justify-center gap-2 px-4 pb-6 text-xs text-slate-400 dark:text-slate-500">
+          <ShieldCheck className="size-3.5" aria-hidden="true" />
+          Your tasks are private to your account
+        </footer>
+      </main>
+    </div>
   )
 }
